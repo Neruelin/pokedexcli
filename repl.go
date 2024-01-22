@@ -11,7 +11,7 @@ import (
 type cliCommand struct {
 	name string
 	description string
-	callback func(*CommandState) error
+	callback func(*CommandState, []string) error
 }
 
 type CommandState struct {
@@ -38,13 +38,18 @@ func getCommands() map[string]cliCommand {
 		},
 		"map": {
 			name: "map",
-			description: "Lists a page of 20 locations in the Pokemon world. Subsequent calls to map will return the next page of data",
+			description: "Lists a page of 20 location areas in the Pokemon world. Subsequent calls to map will return the next page of data",
 			callback: mapCommand,
 		},
 		"mapb": {
 			name: "mapb",
-			description: "Lists the previous page of 20 locations in the Pokemon world. Subsequent calls to mapb will return the next previous page of data",
+			description: "Lists the previous page of 20 location areas in the Pokemon world. Subsequent calls to mapb will return the previous page of data",
 			callback: mapbCommand,
+		},
+		"explore": {
+			name: "explore <location-area>",
+			description: "Lists the pokemon encountered in the provided <location-area>",
+			callback: exploreCommand,
 		},
 	}
 }
@@ -66,13 +71,13 @@ func startRepl() {
 
 		command, exists := getCommands()[commandName]
 		if exists {
-			err := command.callback(&commandState)
+			err := command.callback(&commandState, words[1:])
 			if err != nil {
 				fmt.Println(err)
 			}
 			continue
 		} else {
-			fmt.Println("Unknown command")
+			fmt.Println("Unknown command. Try 'help' for information on what commands are available.")
 			continue
 		}
 	}

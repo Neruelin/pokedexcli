@@ -4,9 +4,9 @@ import (
 	"fmt"
 )
 
-func mapbCommand(commandState *CommandState) error {
+func mapbCommand(commandState *CommandState, args []string) error {
 	if commandState.Previous == "" {
-		return fmt.Errorf("mapb command error: No previous page\n")
+		return fmt.Errorf("mapb command error: No previous page")
 	}
 
 	locations, previous, next, err := commandState.Client.GetLocations(commandState.Previous)

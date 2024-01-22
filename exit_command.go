@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-func exitCommand(commandState *CommandState) error {
+func exitCommand(commandState *CommandState, args []string) error {
 	fmt.Println("Exiting...")
 	os.Exit(0)
 	return nil

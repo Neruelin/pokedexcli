@@ -2,11 +2,11 @@ package main
 
 import "fmt"
 
-func helpCommand(commandState *CommandState) error {
-	fmt.Println("Pokedex CLI is for looking up information about pokemon.")
+func helpCommand(commandState *CommandState, args []string) error {
+	fmt.Println("This Pokedex CLI tool is for listing information about locations in pokemon and what pokemon can be encountered there using https://pokeapi.co/.")
 	fmt.Println("Available Commands:")
-	for name, command := range getCommands() {
-		fmt.Println("\t", name, " - ", command.description)
+	for _, command := range getCommands() {
+		fmt.Printf("\t %s - %s\n", command.name, command.description)
 	}
 	return nil
 }

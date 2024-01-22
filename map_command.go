@@ -4,8 +4,8 @@ import (
 	"fmt"
 )
 
-func mapCommand(commandState *CommandState) error {
-	url := "https://pokeapi.co/api/v2/location"
+func mapCommand(commandState *CommandState, args []string) error {
+	url := ""
 
 	if commandState.Next != "" {
 		url = commandState.Next
