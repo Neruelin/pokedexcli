@@ -2,7 +2,14 @@ package main
 
 import "fmt"
 
+func validateExplore(args []string) bool {
+	return len(args) == 1
+}
+
 func exploreCommand(commandState *CommandState, args []string) (err error) {
+	if !validateExplore(args) {
+		return fmt.Errorf("Invalid arguments to explore command.")
+	}
 	pokemonList, err := commandState.Client.GetLocation(args[0])
 	if err != nil {
 		return

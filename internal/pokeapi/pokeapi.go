@@ -87,24 +87,141 @@ type JsonGetLocation struct {
 	} `json:"pokemon_encounters"`
 }
 
-func (c *Client) getRequest(url string) (data []byte, err error) {
+type Pokemon struct {
+	Abilities []struct{
+		Ability struct{
+			Name string `json:"name"`
+			Url string `json:"url"`
+		} `json:"ability"`
+		IsHidden bool `json:"is_hidden"`
+		Slot int `json:"slot"`
+	} `json:"abilities"`
+	BaseExperience int `json:"base_experience"`
+	Forms []struct{
+		Name string `json:"name"`
+		Url string `json:"url"`
+	} `json:"forms"` 
+	GameIndices []struct{
+		GameIndex int `json:"game_index"`
+		Version struct{
+			Name string `json:"name"`
+			Url string `json:"url"`
+		} `json:"version"`
+	} `json:"game_indices"` 
+	Height int `json:"height"`
+	HeldItems []struct{
+		Item struct{
+			Name string `json:"name"`
+			Url string `json:"url"`
+		} `json:"item"`
+		VersionDetails []struct{
+			Rarity int `json:"rarity"`
+			Version struct{
+				Name string `json:"name"`
+				Url string `json:"url"`
+			} `json:"version"`
+		} `json:"version_details"`
+	} `json:"held_items"` 
+	Id int `json:"id"`
+	IsDefault bool `json:"is_default"`
+	LocationAreaEncounters string `json:"location_area_encounters"`
+	Moves []struct{
+		Move struct{
+			Name string `json:"name"`
+			Url string `json:"url"`
+		} `json:"move"`
+		VersionGroupDetails []struct{
+			LevelLearnedAt int `json:"level_learned_at"`
+			MoveLearnMethod struct{
+				Name string `json:"name"`
+				Url string `json:"url"`
+			} `json:"move_learn_method"`
+			VersionGroup struct{
+				Name string `json:"name"`
+				Url string `json:"url"`
+			} `json:"version_group"`
+		} `json:"version_group_details"`
+	} `json:"moves"` 
+	Name string `json:"name"`
+	Order int `json:"order"`
+	Species struct{
+		Name string `json:"name"`
+		Url string `json:"url"`
+	} `json:"species"` 
+	Sprites struct{
+		BackDefault string `json:"back_default"`
+		BackFemale string `json:"back_female"`
+		BackShiny string `json:"back_shiny"`
+		BackShinyFemale string `json:"back_shiny_female"`
+		FrontDefault string `json:"front_default"`
+		FrontFemale string `json:"front_female"`
+		FrontShiny string `json:"front_shiny"`
+		FrontShinyFemale string `json:"front_shiny_female"`
+		Other struct{
+			DreamWorld struct{
+				FrontDefault string `json:"front_default"`
+				FrontFemale string `json:"front_female"`
+			} `json:"dream_world"`
+			Home struct{
+				FrontDefault string `json:"front_default"`
+				FrontFemale string `json:"front_female"`
+				FrontShiny string `json:"front_shiny"`
+				FrontShinyFemale string `json:"front_shiny_female"`
+			} `json:"home"`
+			OfficialArtwork struct{
+				FrontDefault string `json:"front_default"`
+				FrontShiny string `json:"front_shiny"`
+			} `json:"official-artwork"`
+			Showdown struct{
+				BackDefault string `json:"back_default"`
+				BackFemale string `json:"back_female"`
+				BackShiny string `json:"back_shiny"`
+				BackShinyFemale string `json:"back_shiny_female"`
+				FrontDefault string `json:"front_default"`
+				FrontFemale string `json:"front_female"`
+				FrontShiny string `json:"front_shiny"`
+				FrontShinyFemale string `json:"front_shiny_female"`
+			} `json:"showdown"`
+		} `json:"other"`
+	} `json:"sprites"` 
+	Stats []struct{
+		BaseStat int `json:"base_stat"`
+		Effort int `json:"effort"`
+		Stat struct{
+			Name string `json:"name"`
+			Url string `json:"url"`
+		} `json:"stat"`
+	} `json:"stats"` 
+	Types []struct{
+		Slot int `json:"slot"`
+		Type struct{
+			Name string `json:"name"`
+			Url string `json:"url"`
+		} `json:"type"`
+	} `json:"types"` 
+	Weight int `json:"weight"`
+}
+
+func (c *Client) getRequest(url string) (data []byte, status int, err error) {
 	// Check cache
 	if cacheValue, ok := c.cache.Get(url); ok {
 		data = cacheValue
+		status = 200
 	} else {
 		// Get request
 		res, err := http.Get(url)
+		status = res.StatusCode
 		if err != nil {
-			return []byte{}, err	
+			return []byte{}, status, err	
 		}
 		// Read from body stream
 		body, err := io.ReadAll(res.Body)
 		res.Body.Close()
 		if res.StatusCode > 299 {
-			return []byte{}, fmt.Errorf("Response failed with status code %v", res.StatusCode)
+			return []byte{}, status, fmt.Errorf("Response failed with status code %v", res.StatusCode)
 		}
 		if err != nil {
-			return []byte{}, err
+			return []byte{}, status, err
 		}
 		c.cache.Set(url, body)
 		data = body
@@ -118,7 +235,10 @@ func (c *Client) GetLocations(url string) ([]string, string, string, error) {
 		url = baseURL + "/v2/location-area"
 	}
 
-	data, err := c.getRequest(url)
+	data, _, err := c.getRequest(url)
+	if err != nil {
+		return []string{}, "", "", err
+	}
 	
 	// Converting JSON string to struct
 	jsonLocations := JsonGetLocations{}
@@ -137,8 +257,11 @@ func (c *Client) GetLocations(url string) ([]string, string, string, error) {
 }
 
 func (c *Client) GetLocation(name string) ([]string, error) {
-	data, err := c.getRequest(baseURL + "/v2/location-area/" + name)
+	data, status, err := c.getRequest(baseURL + "/v2/location-area/" + name)
 	if err != nil {
+		if status == 404 {
+			err = fmt.Errorf(name + " is an invalid location.")
+		}
 		return []string{}, err
 	}
 
@@ -156,6 +279,24 @@ func (c *Client) GetLocation(name string) ([]string, error) {
 	}
 
 	return pokemonList, nil
+}
+
+func (c *Client) GetPokemon(name string) (pokemon Pokemon, err error) {
+	data, status, err := c.getRequest(baseURL + "/v2/pokemon/" + name)
+	if err != nil {
+		if status == 404 {
+			err = fmt.Errorf(name + " is an invalid pokemon.")
+		}
+		return Pokemon{}, err
+	}
+
+	jsonGetPokemon := Pokemon{}
+	err = json.Unmarshal(data, &jsonGetPokemon)
+	if err != nil {
+		return 
+	}
+
+	return jsonGetPokemon, nil
 }
 
 type Client struct {

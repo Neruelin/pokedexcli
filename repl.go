@@ -18,6 +18,7 @@ type CommandState struct {
 	Next string
 	Previous string
 	Client pokeapi.Client
+	PokeList map[string]pokeapi.Pokemon
 }
 
 func cleanInput(text string) []string {
@@ -51,11 +52,21 @@ func getCommands() map[string]cliCommand {
 			description: "Lists the pokemon encountered in the provided <location-area>",
 			callback: exploreCommand,
 		},
+		"catch": {
+			name: "catch <pokemon>",
+			description: "Attempts to catch and store the provided <pokemon>",
+			callback: catchCommand,
+		},
+		"inspect": {
+			name: "inspect <pokemon>",
+			description: "Displays data about the provided <pokemon> if they have been caught and added to the pokedex",
+			callback: inspectCommand,
+		},
 	}
 }
 
 func startRepl() {
-	commandState := CommandState{}
+	commandState := CommandState{PokeList: map[string]pokeapi.Pokemon{}}
 	commandState.Client = pokeapi.NewClient()
 	reader := bufio.NewScanner(os.Stdin)
 	for {
