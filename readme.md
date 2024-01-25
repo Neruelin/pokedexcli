@@ -8,6 +8,7 @@ This Pokedex CLI tool is for listing information about locations in pokemon and 
 - explore <location-area> - Lists the pokemon encountered in the provided <location-area>
 - catch <pokemon> - Attempts to catch and store the provided <pokemon>
 - inspect <pokemon> - Displays data about the provided <pokemon> if they have been caught and added to the pokedex
+- pokedex - Lists the names of the pokemon that have been caught
 - help - Displays a help message
 
 ## Running the project
