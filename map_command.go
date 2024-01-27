@@ -20,7 +20,7 @@ func mapCommand(commandState *CommandState, args []string) error {
 	commandState.Next = next
 
 	for _, location := range locations {
-		fmt.Println(location)
+		fmt.Printf("%s\r\n", location)
 	}
 
 	return nil

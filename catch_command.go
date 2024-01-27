@@ -21,9 +21,9 @@ func catchCommand(commandState *CommandState, args []string) (err error) {
 	roll := rand.Intn(pokemon.BaseExperience)
 
 	if roll > 50 {
-		fmt.Printf("%s escaped!\n", args[0])
+		fmt.Printf("%s escaped!\r\n", args[0])
 	} else {
-		fmt.Printf("%s was caught!\n", args[0])
+		fmt.Printf("%s was caught!\r\n", args[0])
 		commandState.PokeList[args[0]] = pokemon
 	}
 

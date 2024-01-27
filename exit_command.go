@@ -6,7 +6,7 @@ import (
 )
 
 func exitCommand(commandState *CommandState, args []string) error {
-	fmt.Println("Exiting...")
+	fmt.Printf("Exiting...\r\n")
 	os.Exit(0)
 	return nil
 }

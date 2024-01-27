@@ -53,8 +53,11 @@ func (pc *PokeCache) eviction(keepThreshold time.Time) {
 	}
 }
 
-func New() PokeCache {
+func New(cacheTTLSeconds int) PokeCache {
+	if cacheTTLSeconds <= 0 {
+		cacheTTLSeconds = 60
+	}
 	pc := PokeCache{store: map[string]CacheEntry{}, mu: sync.Mutex{}}
-	go pc.evictionLoop(60 * time.Second)
+	go pc.evictionLoop(time.Duration(cacheTTLSeconds) * time.Second)
 	return pc
 }

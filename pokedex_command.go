@@ -3,9 +3,9 @@ package main
 import "fmt"
 
 func pokedexCommand(commandState *CommandState, args []string) (err error) {
-	fmt.Println("Your Pokedex:")
+	fmt.Printf("Your Pokedex:\r\n")
 	for key, _ := range commandState.PokeList {
-		fmt.Printf("\t- %s\n", key)
+		fmt.Printf("\t- %s\r\n", key)
 	}
 	return 
 }

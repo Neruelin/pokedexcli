@@ -303,6 +303,6 @@ type Client struct {
 	cache pokecache.PokeCache
 }
 
-func NewClient() Client {
-	return Client{cache: pokecache.New()}
+func NewClient(cacheTTLSeconds int) Client {
+	return Client{cache: pokecache.New(cacheTTLSeconds)}
 }

@@ -14,7 +14,7 @@ func exploreCommand(commandState *CommandState, args []string) (err error) {
 	if err != nil {
 		return
 	} else {
-		fmt.Println("Pokemon in " + args[0] + ":")
+		fmt.Printf("Pokemon in %s:\r\n", args[0])
 		l := len(pokemonList)
 		for idx, name := range pokemonList {
 			fmt.Print(name)
@@ -22,7 +22,7 @@ func exploreCommand(commandState *CommandState, args []string) (err error) {
 				fmt.Print(", ")
 			}
 		}
-		fmt.Println("")
+		fmt.Printf("\r\n")
 	}
 	return
 }
